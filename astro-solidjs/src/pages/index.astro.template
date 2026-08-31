@@ -1,0 +1,14 @@
+---
+import BaseLayout from "@pediment/components/BaseLayout.astro";
+import Nav from "@pediment/components/Nav.astro";
+import Footer from "@pediment/components/Footer.astro";
+---
+
+<BaseLayout title="{{project_name}}" description="{{description}}">
+  <Nav slot="nav" siteName="{{project_name}}" links={[{ label: "Home", href: "/" }]} />
+  <section class="mx-auto max-w-[var(--max-width)] px-4 py-16">
+    <h1 class="text-4xl font-bold">{{project_name}}</h1>
+    <p class="mt-4 text-lg text-[var(--text-secondary)]">{{description}}</p>
+  </section>
+  <Footer slot="footer" />
+</BaseLayout>

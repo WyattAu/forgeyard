@@ -1,0 +1,33 @@
+{
+  "name": "{{project_name}}",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "astro": "^6.0.0",
+    "@astrojs/solid-js": "^6.0.0",
+    "@astrojs/cloudflare": "^12.0.0",
+    "solid-js": "^1.9.0",
+    "@pediment/tokens": "workspace:*",
+    "@pediment/components": "workspace:*",
+    "@pediment/hooks": "workspace:*"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.0",
+    "@solidjs/testing-library": "^0.8.0",
+    "@playwright/test": "^1.50.0",
+    "@biomejs/biome": "^2.0.0"
+  }
+}

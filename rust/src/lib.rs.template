@@ -1,0 +1,8 @@
+#![forbid(unsafe_code)]
+#![deny(missing_docs)]
+
+//! {{description}}
+
+mod error;
+
+pub use error::{{ProjectName}}Error;

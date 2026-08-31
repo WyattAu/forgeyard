@@ -1,0 +1,9 @@
+use thiserror::Error;
+
+/// Error type for {{project_name}}.
+#[derive(Debug, Error)]
+pub enum {{ProjectName}}Error {
+    /// An internal error occurred.
+    #[error("internal error: {0}")]
+    Internal(String),
+}

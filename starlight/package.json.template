@@ -1,0 +1,22 @@
+{
+  "name": "{{project_name}}-docs",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "biome check ."
+  },
+  "dependencies": {
+    "astro": "^6.0.0",
+    "@astrojs/starlight": "^0.32.0",
+    "@astrojs/cloudflare": "^12.0.0",
+    "@pediment/starlight": "workspace:*",
+    "@pediment/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@biomejs/biome": "^2.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
+import cloudflare from "@astrojs/cloudflare";
+import pedimentStarlight from "@pediment/starlight";
+
+export default defineConfig({
+  integrations: [
+    starlight({
+      title: "{{project_name}}",
+      plugins: [pedimentStarlight()],
+    }),
+  ],
+  adapter: cloudflare(),
+});

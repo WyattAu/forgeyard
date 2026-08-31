@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@pediment/tokens";
+@import "@pediment/tokens/spatial-materialism";
+@import "@pediment/tokens/amoebic-ui";
+
+@layer base {
+  body {
+    @apply min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)];
+  }
+}
