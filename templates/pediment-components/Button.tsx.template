@@ -1,0 +1,41 @@
+import { type JSX, splitProps } from "solid-js";
+
+interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
+}
+
+export function Button(props: ButtonProps) {
+  const [local, others] = splitProps(props, ["variant", "size", "class", "children"]);
+
+  const variantClass = () => {
+    switch (local.variant) {
+      case "secondary":
+        return "py-btn-secondary";
+      case "ghost":
+        return "py-btn-ghost";
+      default:
+        return "py-btn-primary";
+    }
+  };
+
+  const sizeClass = () => {
+    switch (local.size) {
+      case "sm":
+        return "py-btn-sm";
+      case "lg":
+        return "py-btn-lg";
+      default:
+        return "py-btn-md";
+    }
+  };
+
+  return (
+    <button
+      class={`py-btn ${variantClass()} ${sizeClass()} ${local.class ?? ""}`}
+      {...others}
+    >
+      {local.children}
+    </button>
+  );
+}

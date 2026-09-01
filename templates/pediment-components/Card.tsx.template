@@ -1,0 +1,44 @@
+import { type JSX, splitProps } from "solid-js";
+
+interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  variant?: "elevated" | "outlined" | "filled";
+}
+
+export function Card(props: CardProps) {
+  const [local, others] = splitProps(props, ["variant", "class", "children"]);
+
+  const variantClass = () => {
+    switch (local.variant) {
+      case "outlined":
+        return "py-card-outlined";
+      case "filled":
+        return "py-card-filled";
+      default:
+        return "py-card-elevated";
+    }
+  };
+
+  return (
+    <div class={`py-card ${variantClass()} ${local.class ?? ""}`} {...others}>
+      {local.children}
+    </div>
+  );
+}
+
+export function CardHeader(props: JSX.HTMLAttributes<HTMLDivElement>) {
+  const [local, others] = splitProps(props, ["class", "children"]);
+  return (
+    <div class={`py-card-header ${local.class ?? ""}`} {...others}>
+      {local.children}
+    </div>
+  );
+}
+
+export function CardBody(props: JSX.HTMLAttributes<HTMLDivElement>) {
+  const [local, others] = splitProps(props, ["class", "children"]);
+  return (
+    <div class={`py-card-body ${local.class ?? ""}`} {...others}>
+      {local.children}
+    </div>
+  );
+}

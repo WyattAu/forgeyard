@@ -1,0 +1,44 @@
+import { type JSX, splitProps, createSignal } from "solid-js";
+
+interface SwitchProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, "type" | "checked" | "onChange"> {
+  label?: string;
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
+}
+
+export function Switch(props: SwitchProps) {
+  const [local, others] = splitProps(props, ["label", "checked", "onChange", "class", "id"]);
+  const [internalChecked, setInternalChecked] = createSignal(local.checked ?? false);
+
+  const checked = () => local.checked ?? internalChecked();
+  const inputId = () => local.id ?? `py-switch-${local.label?.toLowerCase().replace(/\s+/g, "-")}`;
+
+  const handleChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    setInternalChecked(target.checked);
+    local.onChange?.(target.checked);
+  };
+
+  return (
+    <div class={`py-switch-field ${local.class ?? ""}`}>
+      <input
+        id={inputId()}
+        type="checkbox"
+        class="py-switch-input"
+        checked={checked()}
+        onChange={handleChange}
+        {...others}
+      />
+      <label class="py-switch" for={inputId()}>
+        <span class="py-switch-track">
+          <span class="py-switch-thumb" />
+        </span>
+      </label>
+      {local.label && (
+        <label class="py-switch-label" for={inputId()}>
+          {local.label}
+        </label>
+      )}
+    </div>
+  );
+}

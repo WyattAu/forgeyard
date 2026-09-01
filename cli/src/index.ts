@@ -44,10 +44,17 @@ program
   });
 
 // ---------------------------------------------------------------------------
-// `forgeyard add <template>` - Add a template to an existing project
+// `forgeyard add` - Parent command for adding things to a project
 // ---------------------------------------------------------------------------
-program
-  .command("add <template>")
+const addCmd = program
+  .command("add")
+  .description("Add templates or components to an existing project");
+
+// ---------------------------------------------------------------------------
+// `forgeyard add template <template>` - Add a template to an existing project
+// ---------------------------------------------------------------------------
+addCmd
+  .command("template <template>")
   .description("Add a template to an existing project")
   .action((template: string) => {
     const templatesDir = path.join(__dirname, "..", "..", "templates");
@@ -70,6 +77,88 @@ program
     fs.writeFileSync(markerPath, template);
 
     console.log("Done.");
+  });
+
+// ---------------------------------------------------------------------------
+// `forgeyard add component <name>` - Add a pediment component to the project
+// ---------------------------------------------------------------------------
+addCmd
+  .command("component <name>")
+  .description("Add a pediment component to the current project")
+  .action((name: string) => {
+    const targetDir = process.cwd();
+    const pkgPath = path.join(targetDir, "package.json");
+
+    if (!fs.existsSync(pkgPath)) {
+      console.error("No package.json found. Are you in a project directory?");
+      process.exit(1);
+    }
+
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    if (!deps["@pediment/components"]) {
+      console.error(
+        "This project does not appear to use @pediment/components.",
+      );
+      console.error(
+        'Make sure your package.json includes "@pediment/components" as a dependency.',
+      );
+      process.exit(1);
+    }
+
+    const templatesDir = path.join(__dirname, "..", "..", "templates", "pediment-components");
+    const templateName = `${name.charAt(0).toUpperCase() + name.slice(1)}.tsx.template`;
+    const templatePath = path.join(templatesDir, templateName);
+
+    if (!fs.existsSync(templatePath)) {
+      console.error(`Component template "${name}" not found.`);
+      console.error(`Available templates in pediment-components:`);
+      if (fs.existsSync(templatesDir)) {
+        const available = fs
+          .readdirSync(templatesDir)
+          .filter((f) => f.endsWith(".tsx.template"))
+          .map((f) => f.replace(".tsx.template", "").toLowerCase());
+        for (const t of available) {
+          console.log(`  ${t}`);
+        }
+      }
+      process.exit(1);
+    }
+
+    const componentName =
+      name.charAt(0).toUpperCase() + name.slice(1);
+    const destDir = path.join(targetDir, "src", "components");
+    const destPath = path.join(destDir, `${componentName}.tsx`);
+
+    if (fs.existsSync(destPath)) {
+      console.error(`Component ${componentName}.tsx already exists.`);
+      process.exit(1);
+    }
+
+    let content = fs.readFileSync(templatePath, "utf-8");
+    content = content.replace(/\{\{ComponentName\}\}/g, componentName);
+
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.writeFileSync(destPath, content);
+    console.log(`Added: src/components/${componentName}.tsx`);
+
+    // Update barrel file
+    const barrelPath = path.join(targetDir, "src", "components", "index.ts");
+    if (fs.existsSync(barrelPath)) {
+      let barrel = fs.readFileSync(barrelPath, "utf-8");
+      const exportLine = `export { ${componentName} } from "./${componentName}";\n`;
+      if (!barrel.includes(exportLine.trim())) {
+        barrel = barrel.trimEnd() + "\n" + exportLine;
+        fs.writeFileSync(barrelPath, barrel);
+        console.log(`Updated: src/components/index.ts`);
+      }
+    } else {
+      const barrelContent = `export { ${componentName} } from "./${componentName}";\n`;
+      fs.writeFileSync(barrelPath, barrelContent);
+      console.log(`Created: src/components/index.ts`);
+    }
+
+    console.log(`Done. Component "${componentName}" added to your project.`);
   });
 
 // ---------------------------------------------------------------------------

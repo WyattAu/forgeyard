@@ -1,0 +1,31 @@
+import { type JSX, splitProps, createSignal } from "solid-js";
+
+interface InputProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, "onError"> {
+  label?: string;
+  error?: string;
+}
+
+export function Input(props: InputProps) {
+  const [local, others] = splitProps(props, ["label", "error", "class", "id"]);
+  const [focused, setFocused] = createSignal(false);
+
+  const inputId = () => local.id ?? `py-input-${local.label?.toLowerCase().replace(/\s+/g, "-")}`;
+
+  return (
+    <div class={`py-field ${focused() ? "py-field-focused" : ""} ${local.error ? "py-field-error" : ""}`}>
+      {local.label && (
+        <label class="py-label" for={inputId()}>
+          {local.label}
+        </label>
+      )}
+      <input
+        id={inputId()}
+        class={`py-input ${local.class ?? ""}`}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        {...others}
+      />
+      {local.error && <span class="py-error">{local.error}</span>}
+    </div>
+  );
+}
