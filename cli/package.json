@@ -1,0 +1,22 @@
+{
+  "name": "forgeyard-cli",
+  "version": "0.1.0",
+  "description": "CLI tool for scaffolding and managing forgeyard templates",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "forgeyard": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.3"
+  }
+}
