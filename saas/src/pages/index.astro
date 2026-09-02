@@ -1,0 +1,132 @@
+---
+import TemplateSelector from '../components/TemplateSelector';
+import CodePreview from '../components/CodePreview';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forgeyard - Project Scaffolding</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #ededed;
+      min-height: 100vh;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(180deg, #1a1a2e 0%, #0a0a0a 100%);
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #a1a1a1;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .feature-card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: #f59e0b;
+    }
+
+    .feature-card h3 {
+      color: #f59e0b;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 1.8rem;
+      margin: 3rem 0 1.5rem;
+    }
+
+    .scaffold-section {
+      max-width: 1200px;
+      margin: 0 auto 3rem;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .scaffold-section {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Forgeyard</h1>
+    <p>Web-based project scaffolding powered by Rust, Astro, and modern tooling</p>
+  </header>
+
+  <section class="features">
+    <div class="feature-card">
+      <h3>Rust Templates</h3>
+      <p>Fast, memory-safe Rust projects with Cargo configuration</p>
+    </div>
+    <div class="feature-card">
+      <h3>Astro Sites</h3>
+      <p>Modern static sites with island architecture</p>
+    </div>
+    <div class="feature-card">
+      <h3>Starlight Docs</h3>
+      <p>Beautiful documentation sites out of the box</p>
+    </div>
+    <div class="feature-card">
+      <h3>TypeScript</h3>
+      <p>Type-safe projects with proper configuration</p>
+    </div>
+  </section>
+
+  <h2 class="section-title">Select a Template</h2>
+
+  <div class="scaffold-section">
+    <TemplateSelector client:load />
+    <CodePreview client:load />
+  </div>
+</body>
+</html>
