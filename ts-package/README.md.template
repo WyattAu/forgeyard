@@ -1,0 +1,33 @@
+# {{ProjectName}}
+
+> {{description}}
+
+[![CI](https://github.com/WyattAu/{{project_name}}/actions/workflows/ci.yml/badge.svg)](https://github.com/WyattAu/{{project_name}}/actions/workflows/ci.yml)
+
+TypeScript package scaffolded from
+[forgeyard](https://github.com/WyattAu/forgeyard).
+
+## Install
+
+```bash
+npm install {{npm_scope}}/{{project_name}}
+```
+
+## Usage
+
+```ts
+import { hello } from "{{npm_scope}}/{{project_name}}";
+
+console.log(hello("world")); // "Hello, world!"
+```
+
+## Gates
+
+The shared [WyattAu engineering standards](https://github.com/WyattAu/engineering-standards)
+Node gate matrix — install, typecheck, lint, build, test — runs automatically
+on every push (`.github/workflows/ci.yml`). Keep your `package-lock.json`
+committed so installs stay reproducible.
+
+## License
+
+MIT OR Apache-2.0.
