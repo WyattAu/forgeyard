@@ -2,6 +2,19 @@
 #![deny(missing_docs)]
 
 //! {{description}}
+//!
+//! Follows the [WyattAu engineering standards](https://github.com/WyattAu/engineering-standards):
+//! documentation examples are tests, panics are denied, and the shared CI gate
+//! matrix runs on every push.
+//!
+//! # Examples
+//!
+//! ```
+//! use {{crate_name}}::{{ProjectName}}Error;
+//!
+//! let err = {{ProjectName}}Error::Internal("boom".to_string());
+//! assert!(err.to_string().contains("boom"));
+//! ```
 
 mod error;
 

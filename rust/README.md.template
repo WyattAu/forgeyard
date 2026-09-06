@@ -1,0 +1,50 @@
+# {{ProjectName}}
+
+> {{description}}
+
+[![CI](https://github.com/WyattAu/{{project_name}}/actions/workflows/ci.yml/badge.svg)](https://github.com/WyattAu/{{project_name}}/actions/workflows/ci.yml)
+![MSRV](https://img.shields.io/badge/MSRV-1.85-blue)
+[![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](#license)
+
+## Install
+
+```toml
+[dependencies]
+{{project_name}} = "0.1"
+```
+
+## Example
+
+```rust
+use {{crate_name}}::{{ProjectName}}Error;
+
+let err = {{ProjectName}}Error::Internal("boom".to_string());
+assert!(err.to_string().contains("boom"));
+```
+
+Doctests are tests — this example is verified by CI on every push.
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| — | Add your feature table here (standards README §8: README minimum). |
+
+## Standards
+
+This repository follows the
+[WyattAu engineering standards](https://github.com/WyattAu/engineering-standards).
+The shared gate matrix — build (`--locked`), test, clippy (`-D warnings`), fmt,
+cargo-deny, coverage, semver-checks — runs automatically on every push via
+`.github/workflows/ci.yml`.
+
+## Release
+
+Releases go through
+[`engineering-standards/scripts/release.sh`](https://github.com/WyattAu/engineering-standards/blob/main/scripts/release.sh) —
+see [FIRST-RELEASE.md](FIRST-RELEASE.md).
+
+## License
+
+Licensed under either of [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE)
+at your option.

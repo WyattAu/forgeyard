@@ -1,0 +1,2 @@
+# Keep Cargo.lock committed: the gate matrix runs `cargo check --locked`.
+target/

@@ -1,0 +1,15 @@
+//! Criterion baselines for {{crate_name}} (standards README §5: baselines are
+//! committed on `main`; CI fails on regression when bench-regression is on).
+
+use criterion::{Criterion, criterion_group, criterion_main};
+
+use {{crate_name}}::{{ProjectName}}Error;
+
+fn bench_error_display(c: &mut Criterion) {
+    c.bench_function("error_display", |b| {
+        b.iter(|| {{ProjectName}}Error::Internal(String::from("boom")).to_string())
+    });
+}
+
+criterion_group!(benches, bench_error_display);
+criterion_main!(benches);

@@ -1,9 +1,32 @@
 use thiserror::Error;
 
 /// Error type for {{project_name}}.
+///
+/// Crate-owned per the standards: every public fallible function returns
+/// `Result<_, {{ProjectName}}Error>` and documents its failure modes.
 #[derive(Debug, Error)]
 pub enum {{ProjectName}}Error {
     /// An internal error occurred.
     #[error("internal error: {0}")]
     Internal(String),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{{ProjectName}}Error;
+    use proptest::prelude::*;
+
+    #[test]
+    fn display_includes_context() {
+        let err = {{ProjectName}}Error::Internal("boom".to_string());
+        assert_eq!(err.to_string(), "internal error: boom");
+    }
+
+    proptest! {
+        #[test]
+        fn display_preserves_arbitrary_context(msg in ".*") {
+            let err = {{ProjectName}}Error::Internal(msg.clone());
+            prop_assert!(err.to_string().contains(&msg));
+        }
+    }
 }

@@ -1,0 +1,21 @@
+# Golden path: CI is the shared WyattAu gate matrix — nothing repo-local.
+# Policies: https://github.com/WyattAu/engineering-standards (README, "The Gate Matrix")
+name: CI
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  quality:
+    uses: WyattAu/engineering-standards/.github/workflows/rust-kit.yml@main
+    with:
+      # tier selects coverage threshold + lint depth:
+      #   a — pedantic clippy, unwrap/indexing/panic surfaced, coverage >= 90%
+      #   b — coverage >= 80%
+      #   c — coverage >= 70% (informational)
+      # Bump the tier as the crate's risk profile grows ("Tier Definitions" in
+      # the standards README). Optional gates, enabled as needed:
+      #   loom: true / wasm: true / miri: true / bench-regression: true
+      tier: c
+      all-features: true
