@@ -21,7 +21,9 @@ find "$PROJECT" -type f -name "*.template" | while read -r file; do
   target="${file%.template}"
   mv "$file" "$target"
   sed -i "s/{{project_name}}/$PROJECT/g" "$target"
-  sed -i "s/{{ProjectName}}/$(echo "$PROJECT" | sed 's/\b./\U&/g')/g" "$target"
+  sed -i "s/{{crate_name}}/$(echo "$PROJECT" | tr '-' '_')/g" "$target"
+  sed -i "s/{{ProjectName}}/$(echo "$PROJECT" | sed 's/[-_]\(.\)/\U\1/g; s/^\(.\)/\U\1/')/g" "$target"
+  sed -i "s/{{description}}/TODO: describe $PROJECT/g" "$target"
 done
 
 echo "Done! Project '$PROJECT' created."
@@ -29,3 +31,6 @@ echo "  cd $PROJECT"
 echo "  git init"
 echo "  git add -A"
 echo "  git commit -m 'feat: initial scaffold'"
+echo ""
+echo "Gates run automatically on push — see engineering-standards:"
+echo "  https://github.com/WyattAu/engineering-standards#the-gate-matrix"

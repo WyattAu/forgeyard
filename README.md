@@ -18,14 +18,20 @@
 ### Scaffolding a new project
 
 ```bash
-# Clone the template you need
-git clone https://github.com/WyattAu/forgeyard.git
-cp -r forgeyard/rust my-new-project
-cd my-new-project
+# Preferred: the CLI
+cd forgeyard/cli && npm run build
+node dist/index.js init rust my-new-project          # --tier a|b|c (default c)
+node dist/index.js init astro-solidjs my-docs-site
 
-# Or use the scaffolding script
+# Or the scaffolding script
 ./scripts/scaffold.sh rust my-new-project
 ```
+
+Every scaffold is **born-compliant** with the
+[WyattAu engineering standards](https://github.com/WyattAu/engineering-standards):
+the first `git push` triggers the shared gate matrix (rust-kit.yml /
+node-ci.yml) and passes — no repo-local CI to wire, no retrofitting. Release
+automation for Rust crates is documented in `rust/FIRST-RELEASE.md`.
 
 ### What's included
 

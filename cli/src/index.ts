@@ -4,6 +4,7 @@ import { Command } from "commander";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as readline from "node:readline";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,6 +16,97 @@ program
   .name("forgeyard")
   .description("CLI tool for scaffolding and managing forgeyard templates")
   .version("0.1.0");
+
+const TEMPLATES = ["rust", "astro-solidjs", "starlight", "ts-package"];
+
+// ---------------------------------------------------------------------------
+// `forgeyard init` - Scaffold a new project, born-compliant with gates
+// ---------------------------------------------------------------------------
+program
+  .command("init <template> [dir]")
+  .description(
+    "Scaffold a new project from a template (born-compliant with the engineering-standards gate matrix)",
+  )
+  .option(
+    "--tier <tier>",
+    "Standards tier for rust scaffolds: a | b | c (default c)",
+  )
+  .option("--description <description>", "One-line project description")
+  .action(
+    (
+      template: string,
+      dir: string | undefined,
+      opts: { tier?: string; description?: string },
+    ) => {
+      const rootDir = path.join(__dirname, "..", "..");
+      const templateDir = path.join(rootDir, template);
+
+      if (!fs.existsSync(templateDir)) {
+        console.error(`Template "${template}" not found.`);
+        console.error(`Available templates: ${TEMPLATES.join(", ")}`);
+        process.exit(1);
+      }
+
+      const tier = (opts.tier ?? "c").toLowerCase();
+      if (!["a", "b", "c"].includes(tier)) {
+        console.error(`Invalid tier "${tier}" — use a, b, or c.`);
+        process.exit(1);
+      }
+
+      const targetDir = dir ? path.resolve(dir) : process.cwd();
+      if (fs.existsSync(targetDir) && fs.readdirSync(targetDir).length > 0) {
+        console.error(`Target directory not empty: ${targetDir}`);
+        process.exit(1);
+      }
+
+      fs.mkdirSync(targetDir, { recursive: true });
+      console.log(`Scaffolding ${template} -> ${targetDir}`);
+      copyTemplateFiles(templateDir, targetDir, {
+        description: opts.description,
+      });
+
+      if (template === "rust" && tier !== "c") {
+        const ciPath = path.join(targetDir, ".github", "workflows", "ci.yml");
+          const ci = fs
+            .readFileSync(ciPath, "utf-8")
+            .replace(/^(\s*tier: )c\b/m, `$1${tier}`);
+        fs.writeFileSync(ciPath, ci);
+        console.log(`  Standards tier: ${tier}`);
+      }
+
+      fs.writeFileSync(path.join(targetDir, ".forgeyard-template"), template);
+
+      const rel = path.relative(process.cwd(), targetDir) || ".";
+      console.log(`
+Next steps:
+  cd ${rel}
+  git init && git add -A && git commit -m "feat: initial scaffold"
+  git remote add origin git@github.com:WyattAu/${path.basename(targetDir)}.git
+  git push -u origin main
+
+Gates run automatically on push — see engineering-standards:
+  https://github.com/WyattAu/engineering-standards#the-gate-matrix`);
+
+      if (template === "rust") {
+        // The gate matrix runs `cargo check --locked`, which requires a
+        // committed Cargo.lock — generate it now, best-effort.
+        const lock = spawnSync("cargo", ["generate-lockfile"], {
+          cwd: targetDir,
+          stdio: "ignore",
+        });
+        if (lock.error || lock.status !== 0) {
+          console.log(
+            "\nNOTE: cargo not found — run `cargo generate-lockfile` in the project before the first push (CI checks `--locked`).",
+          );
+        } else {
+          console.log("  Cargo.lock: generated (commit it — CI checks --locked)");
+        }
+        console.log(
+          "\nRust crates: release via engineering-standards scripts/release.sh — see FIRST-RELEASE.md.",
+        );
+      }
+    },
+  );
 
 // ---------------------------------------------------------------------------
 // `forgeyard list` - List available templates
@@ -70,7 +162,7 @@ addCmd
     console.log(`Adding template: ${template}`);
     console.log(`Target directory: ${targetDir}`);
 
-    copyTemplateFiles(templateDir, targetDir, template);
+    copyTemplateFiles(templateDir, targetDir, {});
 
     // Write marker file so upgrade can detect the template later
     const markerPath = path.join(targetDir, ".forgeyard-template");
@@ -236,6 +328,38 @@ interface DiffEntry {
   templatePath: string;
 }
 
+interface CopyOpts {
+  description?: string;
+}
+
+/**
+ * Replace template variables in file content.
+ * {{project_name}} — verbatim project directory name.
+ * {{ProjectName}} — PascalCase, hyphens/underscores stripped.
+ * {{crate_name}} — Rust crate identifier (hyphens/underscores -> underscores).
+ * {{description}} — one-line description (or a TODO default).
+ */
+function substitute(
+  content: string,
+  projectName: string,
+  opts: CopyOpts = {},
+): string {
+  let out = content.replace(/\{\{project_name\}\}/g, projectName);
+  out = out.replace(
+    /\{\{ProjectName\}\}/g,
+    projectName
+      .split(/[-_]/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(""),
+  );
+  out = out.replace(/\{\{crate_name\}\}/g, projectName.replace(/[-_]/g, "_"));
+  out = out.replace(
+    /\{\{description\}\}/g,
+    opts.description ?? `TODO: describe ${projectName}`,
+  );
+  return out;
+}
+
 /**
  * Recursively copy template files into the target directory.
  * Files that already exist in the target are skipped.
@@ -243,19 +367,23 @@ interface DiffEntry {
 function copyTemplateFiles(
   templateDir: string,
   targetDir: string,
-  templateName: string,
+  opts: CopyOpts,
+  projectName: string = path.basename(targetDir),
 ): void {
   const entries = fs.readdirSync(templateDir, { withFileTypes: true });
 
   for (const entry of entries) {
     const srcPath = path.join(templateDir, entry.name);
-    const destPath = path.join(targetDir, entry.name);
+    const destName = entry.name.endsWith(".template")
+      ? entry.name.slice(0, -".template".length)
+      : entry.name;
+    const destPath = path.join(targetDir, destName);
 
     if (entry.isDirectory()) {
       if (!fs.existsSync(destPath)) {
         fs.mkdirSync(destPath, { recursive: true });
       }
-      copyTemplateFiles(srcPath, destPath, templateName);
+      copyTemplateFiles(srcPath, destPath, opts, projectName);
       continue;
     }
 
@@ -264,18 +392,7 @@ function copyTemplateFiles(
       continue;
     }
 
-    let content = fs.readFileSync(srcPath, "utf-8");
-    const projectName = path.basename(targetDir);
-
-    // Replace template variables
-    content = content.replace(/\{\{project_name\}\}/g, projectName);
-    content = content.replace(
-      /\{\{ProjectName\}\}/g,
-      projectName
-        .split(/[-_]/)
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(""),
-    );
+    const content = substitute(fs.readFileSync(srcPath, "utf-8"), projectName, opts);
 
     fs.mkdirSync(path.dirname(destPath), { recursive: true });
     fs.writeFileSync(destPath, content);
@@ -387,18 +504,10 @@ function applyUpgrades(
 ): void {
   for (const d of diffs) {
     fs.mkdirSync(path.dirname(d.fullPath), { recursive: true });
-    let content = fs.readFileSync(d.templatePath, "utf-8");
-    const projectName = path.basename(targetDir);
-
-    content = content.replace(/\{\{project_name\}\}/g, projectName);
-    content = content.replace(
-      /\{\{ProjectName\}\}/g,
-      projectName
-        .split(/[-_]/)
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(""),
+    const content = substitute(
+      fs.readFileSync(d.templatePath, "utf-8"),
+      path.basename(targetDir),
     );
-
     fs.writeFileSync(d.fullPath, content);
     console.log(`  Updated: ${d.relativePath}`);
   }
