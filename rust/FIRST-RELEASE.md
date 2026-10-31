@@ -1,7 +1,7 @@
 # First release
 
 Releases are automated by the kit release script. Policy: engineering-standards
-README §1 — no publish without a green gate matrix, a `CHANGELOG.md` entry for
+README §1; no publish without a green gate matrix, a `CHANGELOG.md` entry for
 the version, and a git tag `v<version>` matching `Cargo.toml`.
 
 1. Confirm the gate matrix is green on `main` (CI badge in the README).

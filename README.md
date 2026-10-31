@@ -30,7 +30,7 @@ node dist/index.js init astro-solidjs my-docs-site
 Every scaffold is **born-compliant** with the
 [WyattAu engineering standards](https://github.com/WyattAu/engineering-standards):
 the first `git push` triggers the shared gate matrix (rust-kit.yml /
-node-ci.yml) and passes — no repo-local CI to wire, no retrofitting. Release
+node-ci.yml) and passes; no repo-local CI to wire, no retrofitting. Release
 automation for Rust crates is documented in `rust/FIRST-RELEASE.md`.
 
 ### What's included
